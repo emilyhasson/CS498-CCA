@@ -1,25 +1,23 @@
 #!/usr/bin/env python3
-#YelpReviewReducer.py
 from operator import itemgetter
 import sys
 
-scores = {}
-review_counts = {}
+data = {}
 
 # input comes from STDIN
 for line in sys.stdin:
-    # line = line.strip()
-    business_id, weighted_score = line.split('\t')
-    weighted_score = float(weighted_score)
+        line = eval(line)
+        key = line['business_id']
+        if key not in data:
+                data[key] = {"sum": 0, "numReviews": 0}
+        data[key]["sum"] += line["stars"] * len(line["text"])
+        data[key]["numReviews"] += 1
 
-    if business_id in scores:
-        scores[business_id] += weighted_score
-        review_counts[business_id] += 1
-    else:
-        scores[business_id] = weighted_score
-        review_counts[business_id] = 1
+scores = []
+for business_id, data_dict in data.items():
+        if data_dict["numReviews"] != 0:
+                score = data_dict["sum"] / data_dict["numReviews"]
+                scores.append((business_id, score))
 
-for business_id in scores:
-    avg_score = scores[business_id] / review_counts[business_id]
-    print('%s\t%s' % (business_id, avg_score))
-# print('%s\t%s' % (  ,  )) print as final output
+for item in scores:
+        print('%s\t%s' % (item[0], item[1]))
